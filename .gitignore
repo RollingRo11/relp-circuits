@@ -216,3 +216,18 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+viz/
+
+# Cluster junk
+.claude/
+~./
+*.err
+*.out
+logs/
+slurm-*.out
+slurm-*.err
+
+# Caches
+.cache/
+hub/
+HF_CACHE_DIR/

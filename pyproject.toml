@@ -1,0 +1,64 @@
+[project]
+name = "relp-circuits"
+version = "0.1.0"
+description = "Circuit tracing on OLMo-3 via gradient attribution over MLP neurons (Arora et al., 2026)"
+requires-python = ">=3.12,<3.13"
+readme = "README.md"
+dependencies = [
+    # Pin to cu128 wheels: this cluster's NVIDIA driver is 12.8; torch 2.11+cu130 fails to init.
+    "torch>=2.7,<2.10",
+    # 5.x is a major rewrite that may rename internals we hook into. Stay on 4.57+ minor.
+    "transformers>=4.57,<5",
+    "tokenizers>=0.20",
+    "accelerate>=1.0",
+    "datasets>=3.0",
+    "safetensors>=0.4",
+    "einops>=0.8",
+    "numpy>=2.0",
+    "tqdm>=4.66",
+    "pydantic>=2.7",
+    "huggingface-hub>=0.26",
+    "pyarrow>=17",
+    # Dolma 3 shards are zstd-compressed jsonl; fsspec needs this to stream them.
+    "zstandard>=0.22",
+    # ADAG clustering
+    "scikit-learn>=1.5",
+    "scipy>=1.13",
+]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+]
+# `uv sync --extra sglang` installs the SGLang stack only when needed. Pinned to
+# match activation-harvester's working set (cp312 wheels exist for 0.5.9; 0.5.11
+# only ships cp310, which is why we don't bump).
+sglang = [
+    "sglang==0.5.9",
+    "flashinfer-python>=0.2",
+    "zstandard>=0.22",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["relp_circuits"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["E501"]
